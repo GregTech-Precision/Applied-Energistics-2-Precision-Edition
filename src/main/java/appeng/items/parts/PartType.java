@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import appeng.parts.misc.*;
+import appeng.parts.networking.*;
 import appeng.parts.p2p.*;
 import appeng.parts.reporting.*;
 import com.google.common.collect.ImmutableList;
@@ -60,12 +61,6 @@ import appeng.parts.automation.PartFormationPlane;
 import appeng.parts.automation.PartIdentityAnnihilationPlane;
 import appeng.parts.automation.PartImportBus;
 import appeng.parts.automation.PartLevelEmitter;
-import appeng.parts.networking.PartCableCovered;
-import appeng.parts.networking.PartCableGlass;
-import appeng.parts.networking.PartCableSmart;
-import appeng.parts.networking.PartDenseCableCovered;
-import appeng.parts.networking.PartDenseCableSmart;
-import appeng.parts.networking.PartQuartzFiber;
 import appeng.util.Platform;
 
 
@@ -138,6 +133,38 @@ public enum PartType
 			},
 
 	CABLE_DENSE_COVERED( 500, "cable_dense_covered", EnumSet.of( AEFeature.DENSE_CABLES ), EnumSet.noneOf( IntegrationType.class ), PartDenseCableCovered.class )
+			{
+				@Override
+				public boolean isCable()
+				{
+					return true;
+				}
+
+				@Override
+				@SideOnly( Side.CLIENT )
+				protected List<ModelResourceLocation> createItemModels( String baseName )
+				{
+					return Arrays.stream( AEColor.values() ).map( color -> modelFromBaseName( baseName + "_" + color.name().toLowerCase() ) ).collect( Collectors.toList() );
+				}
+			},
+
+	CABLE_ULTRA_DENSE_COVERED( 600, "cable_ultra_dense_covered", EnumSet.of( AEFeature.ULTRA_DENSE_CABLES ), EnumSet.noneOf( IntegrationType.class ), PartUltraDenseCableCovered.class )
+			{
+				@Override
+				public boolean isCable()
+				{
+					return true;
+				}
+
+				@Override
+				@SideOnly( Side.CLIENT )
+				protected List<ModelResourceLocation> createItemModels( String baseName )
+				{
+					return Arrays.stream( AEColor.values() ).map( color -> modelFromBaseName( baseName + "_" + color.name().toLowerCase() ) ).collect( Collectors.toList() );
+				}
+			},
+
+	CABLE_ULTRA_DENSE_SMART( 620, "cable_ultra_dense_smart", EnumSet.of( AEFeature.ULTRA_DENSE_CABLES ), EnumSet.noneOf( IntegrationType.class ), PartUltraDenseCableSmart.class )
 			{
 				@Override
 				public boolean isCable()

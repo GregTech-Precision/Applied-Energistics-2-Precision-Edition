@@ -54,14 +54,26 @@ public enum AECableType
 	/**
 	 * Smart Dense Cable, represents a tier 2 block that can carry 32 channels.
 	 */
-	DENSE_SMART( AECableVariant.SMART, AECableSize.DENSE );
+	DENSE_SMART( AECableVariant.SMART, AECableSize.DENSE ),
+
+	/**
+	 * Smart Dense Cable, represents a tier 3 block that can carry 128 channels.
+	 */
+	ULTRA_DENSE_COVERED( AECableVariant.COVERED, AECableSize.ULTRA_DENSE ),
+
+	/**
+	 * Smart Dense Cable, represents a tier 3 block that can carry 128 channels.
+	 */
+	ULTRA_DENSE_SMART( AECableVariant.SMART, AECableSize.ULTRA_DENSE );
 
 	public static final AECableType[] VALIDCABLES = {
 			GLASS,
 			COVERED,
 			SMART,
 			DENSE_COVERED,
-			DENSE_SMART
+			DENSE_SMART,
+			ULTRA_DENSE_COVERED,
+			ULTRA_DENSE_SMART
 	};
 
 	private final AECableVariant variant;
@@ -97,6 +109,8 @@ public enum AECableType
 	{
 		return this.variant == AECableVariant.SMART;
 	}
+
+	public boolean isUltraDense() { return this.size == AECableSize.ULTRA_DENSE;}
 
 	public static AECableType min( AECableType a, AECableType b )
 	{

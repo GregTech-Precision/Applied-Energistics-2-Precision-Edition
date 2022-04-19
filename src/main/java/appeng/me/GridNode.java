@@ -65,7 +65,7 @@ import net.minecraftforge.common.util.Constants;
 public class GridNode implements IGridNode, IPathItem
 {
 	private static final MENetworkChannelsChanged EVENT = new MENetworkChannelsChanged();
-	private static final int[] CHANNEL_COUNT = {0, 8, 32};
+	private static final int[] CHANNEL_COUNT = {0, 8, 32, 128};
 
 	private final List<IGridConnection> connections = new ArrayList<>();
 	private final IGridBlock gridProxy;
@@ -212,7 +212,7 @@ public class GridNode implements IGridNode, IPathItem
 	{
 		final EnumSet<GridFlags> set = this.gridProxy.getFlags();
 
-		this.compressedData = set.contains( GridFlags.CANNOT_CARRY ) ? 0 : ( set.contains( GridFlags.DENSE_CAPACITY ) ? 2 : 1 );
+		this.compressedData = set.contains( GridFlags.CANNOT_CARRY ) ? 0 : ( set.contains(GridFlags.ULTRA_DENSE_CAPACITY) ? 3 : set.contains( GridFlags.DENSE_CAPACITY ) ? 2 : 1 );
 
 		this.compressedData |= ( this.gridProxy.getGridColor().ordinal() << 3 );
 
@@ -653,7 +653,7 @@ public class GridNode implements IGridNode, IPathItem
 
 	private int getMaxChannels()
 	{
-		return CHANNEL_COUNT[this.compressedData & 0x03];
+		return CHANNEL_COUNT[this.compressedData & 0x3];
 	}
 
 	@Override
