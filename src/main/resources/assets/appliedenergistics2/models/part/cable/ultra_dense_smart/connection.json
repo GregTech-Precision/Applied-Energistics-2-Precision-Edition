@@ -1,7 +1,7 @@
 {
     "textures": {
-        "base": "appliedenergistics2:parts/cable/dense_smart/${color}",
-        "channels": "appliedenergistics2:parts/cable/dense_smart/${channels}"
+        "base": "appliedenergistics2:parts/cable/ultra_dense_smart/${color}",
+        "channels": "appliedenergistics2:parts/cable/ultra_dense_smart/${channels}"
     },
     "elements": [
         {
