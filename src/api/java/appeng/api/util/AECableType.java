@@ -102,15 +102,13 @@ public enum AECableType
 
 	public boolean isDense()
 	{
-		return this.size == AECableSize.DENSE;
+		return this.size == AECableSize.DENSE || this.size == AECableSize.ULTRA_DENSE;
 	}
 
 	public boolean isSmart()
 	{
 		return this.variant == AECableVariant.SMART;
 	}
-
-	public boolean isUltraDense() { return this.size == AECableSize.ULTRA_DENSE;}
 
 	public static AECableType min( AECableType a, AECableType b )
 	{
@@ -149,6 +147,8 @@ public enum AECableType
 						return COVERED;
 					case DENSE:
 						return DENSE_COVERED;
+					case ULTRA_DENSE:
+						return ULTRA_DENSE_COVERED;
 					default:
 						break;
 				}
@@ -161,6 +161,8 @@ public enum AECableType
 						return SMART;
 					case DENSE:
 						return DENSE_SMART;
+					case ULTRA_DENSE:
+						return ULTRA_DENSE_SMART;
 					default:
 						break;
 				}

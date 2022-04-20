@@ -107,6 +107,12 @@ class CableBuilder
 			case DENSE_SMART:
 				textureFolder = "parts/cable/dense_smart/";
 				break;
+			case ULTRA_DENSE_SMART:
+				textureFolder = "parts/cable/ultra_dense_smart/";
+				break;
+			case ULTRA_DENSE_COVERED:
+				textureFolder = "parts/cable/ultra_dense_covered/";
+				break;
 			default:
 				throw new IllegalStateException( "Cable type " + cableType + " does not support connections." );
 		}
@@ -134,6 +140,10 @@ class CableBuilder
 			case DENSE_SMART:
 				this.addCableCore( CableCoreType.DENSE, color, quadsOut );
 				break;
+			case ULTRA_DENSE_COVERED:
+			case ULTRA_DENSE_SMART:
+				this.addCableCore(CableCoreType.ULTRA_DENSE, color, quadsOut);
+				break;
 			default:
 		}
 	}
@@ -154,6 +164,8 @@ class CableBuilder
 				cubeBuilder.addCube( 5, 5, 5, 11, 11, 11 );
 				break;
 			case DENSE:
+				cubeBuilder.addCube( 3, 3, 3, 13, 13, 13 );
+			case ULTRA_DENSE:
 				cubeBuilder.addCube( 3, 3, 3, 13, 13, 13 );
 				break;
 		}

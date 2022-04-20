@@ -55,7 +55,7 @@ public class PartUltraDenseCable extends PartCable {
 
         for( final AEPartLocation of : this.getConnections() )
         {
-            if( this.isUltraDense( of ) )
+            if( this.isDense( of ) )
             {
                 switch( of )
                 {
@@ -108,14 +108,14 @@ public class PartUltraDenseCable extends PartCable {
         }
     }
 
-    private boolean isUltraDense( final AEPartLocation of )
+    private boolean isDense( final AEPartLocation of )
     {
         final TileEntity te = this.getTile().getWorld().getTileEntity( this.getTile().getPos().offset( of.getFacing() ) );
 
         if( te instanceof IGridHost)
         {
             final AECableType t = ( (IGridHost) te ).getCableConnectionType( of.getOpposite() );
-            return t.isUltraDense();
+            return t.isDense();
         }
 
         return false;

@@ -1,73 +1,73 @@
 {
     "textures": {
-        "base": "appliedenergistics2:parts/cable/ultra_dense_covered/${color}"
+        "base": "appliedenergistics2:parts/cable/dense_covered/${color}"
     },
     "elements": [
         {
             "name": "Element",
             "from": [
-                5.0,
-                5.0,
-                5.0
+                3.0,
+                3.0,
+                3.0
             ],
             "to": [
-                11.0,
-                11.0,
-                11.0
+                13.0,
+                13.0,
+                13.0
             ],
             "faces": {
                 "north": {
                     "texture": "#base",
                     "uv": [
-                        7.5,
-                        7.5,
-                        8.5,
-                        8.5
+                        5.5,
+                        5.5,
+                        10.5,
+                        10.5
                     ]
                 },
                 "east": {
                     "texture": "#base",
                     "uv": [
-                        7.5,
-                        7.5,
-                        8.5,
-                        8.5
+                        5.5,
+                        5.5,
+                        10.5,
+                        10.5
                     ]
                 },
                 "south": {
                     "texture": "#base",
                     "uv": [
-                        8.5,
-                        7.5,
-                        7.5,
-                        8.5
+                        10.5,
+                        5.5,
+                        5.5,
+                        10.5
                     ]
                 },
                 "west": {
                     "texture": "#base",
                     "uv": [
-                        8.5,
-                        7.5,
-                        7.5,
-                        8.5
+                        10.5,
+                        5.5,
+                        5.5,
+                        10.5
                     ]
                 },
                 "up": {
                     "texture": "#base",
                     "uv": [
-                        7.5,
-                        7.5,
-                        8.5,
-                        8.5
+                        5.5,
+                        5.5,
+                        10.5,
+                        10.5
                     ]
                 },
                 "down": {
                     "texture": "#base",
                     "uv": [
-                        7.5,
-                        7.5,
-                        8.5,
-                        8.5
+                        5.5,
+                        5.5,
+                        10.5,
+                        10.5
                     ]
                 }
             }
