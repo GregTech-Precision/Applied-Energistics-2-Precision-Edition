@@ -585,6 +585,49 @@ class CableBuilder
 		addStraightDenseCableSizedCube( facing, cubeBuilder );
 	}
 
+	// Ultra dense
+	public void addStraightUltraDenseCoveredConnection( EnumFacing facing, AEColor cableColor, List<BakedQuad> quadsOut )
+	{
+		CubeBuilder cubeBuilder = new CubeBuilder( this.format, quadsOut );
+
+		TextureAtlasSprite texture = this.connectionTextures.get( AECableType.ULTRA_DENSE_COVERED ).get( cableColor );
+		cubeBuilder.setTexture( texture );
+
+		setStraightCableUVs( cubeBuilder, facing, 5, 11 );
+
+		addStraightDenseCableSizedCube( facing, cubeBuilder );
+	}
+
+	public void addStraightUltraDenseSmartConnection( EnumFacing facing, AEColor cableColor, int channels, List<BakedQuad> quadsOut )
+	{
+		CubeBuilder cubeBuilder = new CubeBuilder( this.format, quadsOut );
+
+		TextureAtlasSprite texture = this.connectionTextures.get( AECableType.ULTRA_DENSE_SMART ).get( cableColor );
+		cubeBuilder.setTexture( texture );
+
+		setStraightCableUVs( cubeBuilder, facing, 5, 11 );
+
+		addStraightDenseCableSizedCube( facing, cubeBuilder );
+
+//		Smart textures are not realized yet
+//		// Dense cables show used channels in groups of 4, rounded up
+//		channels = ( channels + 3 ) / 4;
+//
+//		TextureAtlasSprite oddChannel = this.smartCableTextures.getOddTextureForChannels( channels );
+//		TextureAtlasSprite evenChannel = this.smartCableTextures.getEvenTextureForChannels( channels );
+//
+//		// Render the channel indicators brightly lit at night
+//		cubeBuilder.setRenderFullBright( true );
+//
+//		cubeBuilder.setTexture( oddChannel );
+//		cubeBuilder.setColorRGB( cableColor.blackVariant );
+//		addStraightDenseCableSizedCube( facing, cubeBuilder );
+//
+//		cubeBuilder.setTexture( evenChannel );
+//		cubeBuilder.setColorRGB( cableColor.whiteVariant );
+//		addStraightDenseCableSizedCube( facing, cubeBuilder );
+	}
+
 	private static void addDenseCableSizedCube( EnumFacing facing, CubeBuilder cubeBuilder )
 	{
 		switch( facing )

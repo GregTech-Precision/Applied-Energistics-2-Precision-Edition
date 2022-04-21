@@ -19,6 +19,8 @@
 package appeng.integration.modules.theoneprobe.part;
 
 
+import appeng.parts.networking.PartUltraDenseCable;
+import appeng.parts.networking.PartUltraDenseCableSmart;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,16 +42,16 @@ public class ChannelInfoProvider implements IPartProbInfoProvider
 	@Override
 	public void addProbeInfo( IPart part, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data )
 	{
-		if( part instanceof PartDenseCableSmart || part instanceof PartCableSmart )
+		if(part instanceof PartUltraDenseCableSmart || part instanceof PartDenseCableSmart || part instanceof PartCableSmart )
 		{
 			final int usedChannels;
-			final int maxChannels = ( part instanceof PartDenseCableSmart ) ? 32 : 8;
+			final int maxChannels = (part instanceof PartUltraDenseCableSmart) ? 128 : ( part instanceof PartDenseCableSmart ) ? 32 : 8;
 
 			if( part.getGridNode().isActive() )
 			{
 				final NBTTagCompound tmp = new NBTTagCompound();
 				part.writeToNBT( tmp );
-				usedChannels = tmp.getByte( "usedChannels" );
+				usedChannels = tmp.getShort( "usedChannels" );
 			}
 			else
 			{

@@ -211,10 +211,10 @@ public class CableBusBakedModel implements IBakedModel
 					this.cableBuilder.addStraightDenseSmartConnection( facing, cableColor, renderState.getChannelsOnSide().get( facing ), quadsOut );
 					break;
 				case ULTRA_DENSE_COVERED:
-					this.cableBuilder.addStraightDenseCoveredConnection( facing, cableColor, quadsOut );
+					this.cableBuilder.addStraightUltraDenseCoveredConnection( facing, cableColor, quadsOut );
 					break;
 				case ULTRA_DENSE_SMART:
-					this.cableBuilder.addStraightDenseSmartConnection( facing, cableColor, renderState.getChannelsOnSide().get( facing ), quadsOut );
+					this.cableBuilder.addStraightUltraDenseSmartConnection( facing, cableColor, renderState.getChannelsOnSide().get( facing ), quadsOut );
 					break;
 				default:
 					break;

@@ -207,12 +207,21 @@ public class GridNode implements IGridNode, IPathItem
 		}
 	}
 
+	private int getCompressedDataIndex(EnumSet<GridFlags> set){
+		if(set.contains(GridFlags.CANNOT_CARRY))
+			return 0;
+		else if(set.contains(GridFlags.ULTRA_DENSE_CAPACITY))
+			return 3;
+		else if(set.contains(GridFlags.DENSE_CAPACITY))
+			return 2;
+		else
+			return 1;
+	}
+
 	@Override
 	public void updateState()
 	{
-		final EnumSet<GridFlags> set = this.gridProxy.getFlags();
-
-		this.compressedData = set.contains( GridFlags.CANNOT_CARRY ) ? 0 : ( set.contains(GridFlags.ULTRA_DENSE_CAPACITY) ? 3 : set.contains( GridFlags.DENSE_CAPACITY ) ? 2 : 1 );
+		this.compressedData = getCompressedDataIndex(this.gridProxy.getFlags());
 
 		this.compressedData |= ( this.gridProxy.getGridColor().ordinal() << 3 );
 
