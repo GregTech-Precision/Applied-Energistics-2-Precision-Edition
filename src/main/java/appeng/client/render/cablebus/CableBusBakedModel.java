@@ -245,7 +245,9 @@ public class CableBusBakedModel implements IBakedModel
 					break;
 				case DENSE_COVERED:
 				case DENSE_SMART:
-					// Dense cables do not render connections to parts since none can be attached
+				case ULTRA_DENSE_COVERED:
+				case ULTRA_DENSE_SMART:
+					// Dense/Ultra Dense cables do not render connections to parts since none can be attached
 					break;
 				default:
 					break;
@@ -278,10 +280,10 @@ public class CableBusBakedModel implements IBakedModel
 					this.cableBuilder.addDenseSmartConnection( facing, cableColor, connectionType, cableBusAdjacent, channels, quadsOut );
 					break;
 				case ULTRA_DENSE_COVERED:
-					this.cableBuilder.addDenseCoveredConnection( facing, cableColor, connectionType, cableBusAdjacent, quadsOut );
+					this.cableBuilder.addUltraDenseCoveredConnection( facing, cableColor, connectionType, cableBusAdjacent, quadsOut );
 					break;
 				case ULTRA_DENSE_SMART:
-					this.cableBuilder.addDenseSmartConnection( facing, cableColor, connectionType, cableBusAdjacent, channels, quadsOut );
+					this.cableBuilder.addUltraDenseSmartConnection( facing, cableColor, connectionType, cableBusAdjacent, channels, quadsOut );
 					break;
 				default:
 					break;
