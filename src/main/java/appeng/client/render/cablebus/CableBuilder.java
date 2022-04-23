@@ -551,7 +551,7 @@ class CableBuilder
 		TextureAtlasSprite texture = this.connectionTextures.get( AECableType.DENSE_COVERED ).get( cableColor );
 		cubeBuilder.setTexture( texture );
 
-		setStraightCableUVs( cubeBuilder, facing, 5, 11 );
+		setStraightCableUVs( cubeBuilder, facing, 4, 12 );
 
 		addStraightDenseCableSizedCube( facing, cubeBuilder );
 	}
@@ -563,7 +563,7 @@ class CableBuilder
 		TextureAtlasSprite texture = this.connectionTextures.get( AECableType.DENSE_SMART ).get( cableColor );
 		cubeBuilder.setTexture( texture );
 
-		setStraightCableUVs( cubeBuilder, facing, 5, 11 );
+		setStraightCableUVs( cubeBuilder, facing, 4, 12 );
 
 		addStraightDenseCableSizedCube( facing, cubeBuilder );
 
@@ -669,7 +669,7 @@ class CableBuilder
 		TextureAtlasSprite texture = this.connectionTextures.get( AECableType.ULTRA_DENSE_COVERED ).get( cableColor );
 		cubeBuilder.setTexture( texture );
 
-		setStraightCableUVs( cubeBuilder, facing, 5, 11 );
+		setStraightCableUVs( cubeBuilder, facing, 4, 12 );
 
 		addStraightDenseCableSizedCube( facing, cubeBuilder );
 	}
@@ -681,7 +681,7 @@ class CableBuilder
 		TextureAtlasSprite texture = this.connectionTextures.get( AECableType.ULTRA_DENSE_SMART ).get( cableColor );
 		cubeBuilder.setTexture( texture );
 
-		setStraightCableUVs( cubeBuilder, facing, 5, 11 );
+			setStraightCableUVs( cubeBuilder, facing, 4, 12 );
 
 		addStraightDenseCableSizedCube( facing, cubeBuilder );
 
