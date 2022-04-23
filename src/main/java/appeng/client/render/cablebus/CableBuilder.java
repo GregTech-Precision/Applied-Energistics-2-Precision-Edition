@@ -628,6 +628,10 @@ class CableBuilder
 			this.addDenseCoveredConnection( facing, cableColor, connectionType, cableBusAdjacent, quadsOut );
 			return;
 		}
+		else if(connectionType == AECableType.ULTRA_DENSE_COVERED){
+			this.addUltraDenseCoveredConnection( facing, cableColor, connectionType, cableBusAdjacent, quadsOut );
+			return;
+		}
 
 		CubeBuilder cubeBuilder = new CubeBuilder( this.format, quadsOut );
 
