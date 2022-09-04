@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import appeng.api.config.Upgrades;
 import appeng.helpers.DualityInterface;
 import appeng.helpers.PatternHelper;
+import appeng.tile.crafting.TileCraftingStorageTile;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -218,7 +219,7 @@ public final class CraftingCPUCluster implements IAECluster, ICraftingCPU
 		}
 		else if( te.isAccelerator() )
 		{
-			this.accelerator++;
+			this.accelerator += te.getAcceleration();
 		}
 	}
 
