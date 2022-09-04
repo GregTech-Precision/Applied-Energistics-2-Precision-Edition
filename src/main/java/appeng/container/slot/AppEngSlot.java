@@ -120,7 +120,7 @@ public class AppEngSlot extends Slot
 	{
 		if( this.isSlotEnabled() )
 		{
-			ItemHandlerUtil.setStackInSlot( this.itemHandler, this.index, stack );
+			ItemHandlerUtil.setStackInSlot( this.itemHandler, this.index, stack.copy() );
 
 			if( this.getContainer() != null )
 			{
@@ -138,6 +138,16 @@ public class AppEngSlot extends Slot
 	public void onSlotChanged()
 	{
 		this.setIsValid( hasCalculatedValidness.NotAvailable );
+		if( this.isSlotEnabled() )
+		{
+			ItemHandlerUtil.setStackInSlot( this.itemHandler, this.index, this.getStack().copy() );
+
+			if( this.getContainer() != null )
+			{
+				this.getContainer().onSlotChange( this );
+			}
+		}
+		super.onSlotChanged();
 	}
 
 	@Override

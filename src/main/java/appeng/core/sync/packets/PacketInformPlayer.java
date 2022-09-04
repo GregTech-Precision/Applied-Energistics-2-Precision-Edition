@@ -33,10 +33,10 @@ public class PacketInformPlayer extends AppEngPacket
 		}
 	}
 
-	public PacketInformPlayer( IAEItemStack extra, IAEItemStack result, InfoType type ) throws IOException
+	public PacketInformPlayer( IAEItemStack expected, IAEItemStack actual, InfoType type ) throws IOException
 	{
-		this.reportedItem = extra;
-		this.actualItem = result;
+		this.reportedItem = expected;
+		this.actualItem = actual;
 		this.type = type;
 
 		final ByteBuf data = Unpooled.buffer();
@@ -61,7 +61,7 @@ public class PacketInformPlayer extends AppEngPacket
 
 		if( this.type == InfoType.PARTIAL_ITEM_EXTRACTION )
 		{
-			AppEng.proxy.getPlayers().get( 0 ).sendStatusMessage( new TextComponentString( "System reported " + reportedItem.getStackSize() + " " + reportedItem.getItem().getItemStackDisplayName( reportedItem.getDefinition() ) + " available but could only extract" + actualItem.getStackSize() ), false );
+			AppEng.proxy.getPlayers().get( 0 ).sendStatusMessage( new TextComponentString( "System reported " + reportedItem.getStackSize() + " " + reportedItem.getItem().getItemStackDisplayName( reportedItem.getDefinition() ) + " available but could only extract " + actualItem.getStackSize() ), false );
 		}
 		else if( this.type == InfoType.NO_ITEMS_EXTRACTED )
 		{
