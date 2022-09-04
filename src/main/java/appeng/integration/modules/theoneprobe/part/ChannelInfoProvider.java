@@ -19,6 +19,8 @@
 package appeng.integration.modules.theoneprobe.part;
 
 
+import appeng.core.AEConfig;
+import appeng.core.features.AEFeature;
 import appeng.parts.networking.PartUltraDenseCable;
 import appeng.parts.networking.PartUltraDenseCableSmart;
 import net.minecraft.block.state.IBlockState;
@@ -42,6 +44,10 @@ public class ChannelInfoProvider implements IPartProbInfoProvider
 	@Override
 	public void addProbeInfo( IPart part, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data )
 	{
+		if( !AEConfig.instance().isFeatureEnabled( AEFeature.CHANNELS ) )
+		{
+			return;
+		}
 		if(part instanceof PartUltraDenseCableSmart || part instanceof PartDenseCableSmart || part instanceof PartCableSmart )
 		{
 			final int usedChannels;
