@@ -44,6 +44,8 @@ public final class ApiParts implements IParts
 	private final AEColoredItemDefinition cableGlass;
 	private final AEColoredItemDefinition cableDenseCovered;
 	private final AEColoredItemDefinition cableDenseSmart;
+	private final AEColoredItemDefinition cableUltraDenseCovered;
+	private final AEColoredItemDefinition cableUltraDenseSmart;
 	// private final AEColoredItemDefinition lumenCableSmart;
 	// private final AEColoredItemDefinition lumenCableCovered;
 	// private final AEColoredItemDefinition lumenCableGlass;
@@ -106,6 +108,8 @@ public final class ApiParts implements IParts
 		this.cableGlass = constructColoredDefinition( itemPart, PartType.CABLE_GLASS );
 		this.cableDenseCovered = constructColoredDefinition( itemPart, PartType.CABLE_DENSE_COVERED );
 		this.cableDenseSmart = constructColoredDefinition( itemPart, PartType.CABLE_DENSE_SMART );
+		this.cableUltraDenseCovered = constructColoredDefinition( itemPart, PartType.CABLE_ULTRA_DENSE_COVERED );
+		this.cableUltraDenseSmart = constructColoredDefinition( itemPart, PartType.CABLE_ULTRA_DENSE_SMART );
 		// this.lumenCableSmart = Optional.absent(); // has yet to be implemented, no PartType defined for it yet
 		// this.lumenCableCovered = Optional.absent(); // has yet to be implemented, no PartType defined for it yet
 		// this.lumenCableGlass = Optional.absent(); // has yet to be implemented, no PartType defined for it yet
@@ -196,6 +200,16 @@ public final class ApiParts implements IParts
 	public AEColoredItemDefinition cableDenseSmart()
 	{
 		return this.cableDenseSmart;
+	}
+
+	@Override
+	public AEColoredItemDefinition cableUltraDenseCovered() {
+		return this.cableUltraDenseCovered;
+	}
+
+	@Override
+	public AEColoredItemDefinition cableUltraDenseSmart() {
+		return this.cableUltraDenseSmart;
 	}
 
 	@Override

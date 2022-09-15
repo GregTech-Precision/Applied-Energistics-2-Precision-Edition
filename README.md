@@ -1,10 +1,10 @@
-This is a fork of AE2 i made for trying to solve issues for the [Omnifactory](https://www.curseforge.com/minecraft/modpacks/omnifactory) modpack.
+This is a fork of PAE2 for [Precision](cf nullptr) modpack.
 
 See https://github.com/PrototypeTrousers/Applied-Energistics-2/tree/AE2-Omnifactory branch for commits
 and
 https://github.com/PrototypeTrousers/Applied-Energistics-2/releases for the compiled jars.
 
-# Applied Energistics 2 (PrototypeTrousers fork for Omnifactory)
+# Applied Energistics 2 (WALHAY Fork for Precision)
 
 ## About
 

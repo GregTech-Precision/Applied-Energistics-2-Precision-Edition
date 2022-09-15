@@ -80,15 +80,7 @@ public class TileCraftingTile extends AENetworkTile implements IAEMultiBlock, IP
 	protected ItemStack getItemFromTile( final Object obj )
 	{
 		Optional<ItemStack> is = Optional.empty();
-
-		if( ( (TileCraftingTile) obj ).isAccelerator() )
-		{
-			is = AEApi.instance().definitions().blocks().craftingAccelerator().maybeStack( 1 );
-		}
-		else
-		{
-			is = AEApi.instance().definitions().blocks().craftingUnit().maybeStack( 1 );
-		}
+		is = AEApi.instance().definitions().blocks().craftingUnit().maybeStack( 1 );
 
 		return is.orElseGet( () -> super.getItemFromTile( obj ) );
 	}
@@ -110,15 +102,13 @@ public class TileCraftingTile extends AENetworkTile implements IAEMultiBlock, IP
 		}
 	}
 
+	public int getAcceleration(){
+		return 0;
+	}
+
 	public boolean isAccelerator()
 	{
-		if( this.world == null )
-		{
-			return false;
-		}
-
-		final BlockCraftingUnit unit = (BlockCraftingUnit) this.world.getBlockState( this.pos ).getBlock();
-		return unit.type == CraftingUnitType.ACCELERATOR;
+		return false;
 	}
 
 	@Override
