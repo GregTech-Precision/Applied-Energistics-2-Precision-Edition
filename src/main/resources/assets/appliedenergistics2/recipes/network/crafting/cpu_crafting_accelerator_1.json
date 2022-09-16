@@ -5,7 +5,7 @@
             "values": [
                 {
                     "type": "minecraft:item_exists",
-                    "item": "appliedenergistics2:crafting_accelerator"
+                    "item": "appliedenergistics2:crafting_accelerator_1"
                 },
                 {
                     "type": "minecraft:item_exists",
@@ -19,7 +19,7 @@
         }
     ],
     "result": {
-        "item": "appliedenergistics2:crafting_accelerator"
+        "item": "appliedenergistics2:crafting_accelerator_1"
     },
     "type": "forge:ore_shapeless",
     "ingredients": [
