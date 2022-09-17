@@ -155,15 +155,16 @@ public class PartP2PGTCEPower extends PartP2PTunnel<PartP2PGTCEPower>
 					PartP2PGTCEPower target = outputs.poll();
 					final IEnergyContainer output = target.getAttachedEnergyStorage();
 
-					if( output == null || !output.inputsEnergy( facing ) || output.getEnergyCanBeInserted() <= 0 )
+					if( output == null || !output.inputsEnergy( target.getSide().getFacing().getOpposite() ) || output.getEnergyCanBeInserted() <= 0 )
 					{
 						continue;
 					}
 
-					amperesUsed += output.acceptEnergyFromNetwork( facing, voltage, amperage - amperesUsed );
+					amperesUsed += output.acceptEnergyFromNetwork( target.getSide().getFacing().getOpposite(), voltage, amperage - amperesUsed );
 
-					if( amperage >= amperesUsed )
+					if( amperesUsed == amperage)
 					{
+						outputs.clear();
 						break;
 					}
 				}
