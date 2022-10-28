@@ -19,21 +19,8 @@
 package appeng.client.me;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.item.ItemStack;
-
 import appeng.api.AEApi;
-import appeng.api.config.SearchBoxMode;
-import appeng.api.config.Settings;
-import appeng.api.config.SortOrder;
-import appeng.api.config.ViewItems;
-import appeng.api.config.YesNo;
+import appeng.api.config.*;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
@@ -46,255 +33,243 @@ import appeng.items.storage.ItemViewCell;
 import appeng.util.ItemSorters;
 import appeng.util.Platform;
 import appeng.util.prioritylist.IPartitionList;
+import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 
-public class ItemRepo
-{
+public class ItemRepo {
 
-	private final IItemList<IAEItemStack> list = AEApi.instance().storage().getStorageChannel( IItemStorageChannel.class ).createList();
-	private final ArrayList<IAEItemStack> view = new ArrayList<>();
-	private final IScrollSource src;
-	private final ISortSource sortSrc;
+    private final IItemList<IAEItemStack> list = AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList();
+    private final List<IAEItemStack> view;
+    private final IScrollSource src;
+    private final ISortSource sortSrc;
 
-	private int rowSize = 9;
+    private int rowSize = 9;
 
-	private String searchString = "";
-	private IPartitionList<IAEItemStack> myPartitionList;
-	private String innerSearch = "";
-	private boolean hasPower;
+    private volatile String searchString = "";
+    private IPartitionList<IAEItemStack> myPartitionList;
+    private String innerSearch = "";
+    private boolean hasPower;
 
-	public ItemRepo( final IScrollSource src, final ISortSource sortSrc )
-	{
-		this.src = src;
-		this.sortSrc = sortSrc;
-	}
+    public ItemRepo(final IScrollSource src, final ISortSource sortSrc) {
+        this.src = src;
+        this.sortSrc = sortSrc;
 
-	public IAEItemStack getReferenceItem( int idx )
-	{
-		idx += this.src.getCurrentScroll() * this.rowSize;
+        this.view = Collections.synchronizedList(new ArrayList<>());
+        list.forEach(this.view::add);
+    }
 
-		if( idx >= this.view.size() )
-		{
-			return null;
-		}
-		return this.view.get( idx );
-	}
+    public IAEItemStack getReferenceItem(int idx) {
+        idx += this.src.getCurrentScroll() * this.rowSize;
 
-	void setSearch( final String search )
-	{
-		this.searchString = search == null ? "" : search;
-	}
+        if (idx >= this.view.size()) {
+            return null;
+        }
+        return this.view.get(idx);
+    }
 
-	public void postUpdate( final IAEItemStack is )
-	{
-		final IAEItemStack st = this.list.findPrecise( is );
+    void setSearch(final String search) {
+        this.searchString = search == null ? "" : search;
+    }
 
-		if( st != null )
-		{
-			st.reset();
-			st.add( is );
-		}
-		else
-		{
-			this.list.add( is );
-		}
-	}
+    public void postUpdate(final IAEItemStack is) {
+        final IAEItemStack st = this.list.findPrecise(is);
 
-	public long getItemCount( final IAEItemStack is )
-	{
-		IAEItemStack st = this.list.findPrecise( is );
-		return st == null ? 0 : st.getStackSize();
-	}
+        if (st != null) {
+            st.reset();
+            st.add(is);
+        } else {
+            this.list.add(is);
+        }
+    }
 
-	public void setViewCell( final ItemStack[] list )
-	{
-		this.myPartitionList = ItemViewCell.createFilter( list );
-		this.updateView();
-	}
+    public long getItemCount(final IAEItemStack is) {
+        IAEItemStack st = this.list.findPrecise(is);
+        return st == null ? 0 : st.getStackSize();
+    }
 
-	public void updateView()
-	{
-		this.view.clear();
+    public void setViewCell(final ItemStack[] list) {
+        this.myPartitionList = ItemViewCell.createFilter(list);
+        this.updateView();
+    }
 
-		this.view.ensureCapacity( this.list.size() );
+    private CompletableFuture<Void> searchTask = null;
 
-		final Enum viewMode = this.sortSrc.getSortDisplay();
-		final Enum searchMode = AEConfig.instance().getConfigManager().getSetting( Settings.SEARCH_MODE );
-		final boolean needsZeroCopy = viewMode == ViewItems.CRAFTABLE;
+    public void updateView() {
+        if (searchTask != null) {
+            return;
+        }
 
-		if( searchMode == SearchBoxMode.JEI_AUTOSEARCH || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH || searchMode == SearchBoxMode.JEI_AUTOSEARCH_KEEP || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH_KEEP )
-		{
-			this.updateJEI( this.searchString );
-		}
+        // Since sortSrc is final, so we can safely call it inside lambda
+        searchTask = CompletableFuture.supplyAsync(() -> {
+            IItemList<IAEItemStack> list = this.list.clone();
+            List<IAEItemStack> view = new ArrayList<>(list.size());
+            Enum viewMode = this.sortSrc.getSortDisplay();
 
-		final boolean terminalSearchToolTips = AEConfig.instance().getConfigManager().getSetting( Settings.SEARCH_TOOLTIPS ) != YesNo.NO;
+            boolean needsZeroCopy = viewMode == ViewItems.CRAFTABLE;
 
-		boolean searchMod = false;
+            boolean terminalSearchToolTips = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_TOOLTIPS) != YesNo.NO;
 
-		this.innerSearch = searchString.toLowerCase();
-		if( this.innerSearch.startsWith( "@" ) )
-		{
-			searchMod = true;
-			this.innerSearch = this.innerSearch.substring( 1 );
-		}
+            boolean searchMod = false;
 
-		Pattern m = null;
-		try
-		{
-			m = Pattern.compile( this.innerSearch, Pattern.CASE_INSENSITIVE );
-		}
-		catch( final Throwable ignore )
-		{
-			try
-			{
-				m = Pattern.compile( Pattern.quote( this.innerSearch ), Pattern.CASE_INSENSITIVE );
-			}
-			catch( final Throwable __ )
-			{
-				return;
-			}
-		}
+            String innerSearch = searchString.toLowerCase();
+            if (innerSearch.startsWith("@")) {
+                searchMod = true;
+                innerSearch = innerSearch.substring(1);
+            }
 
-		boolean notDone = false;
-		for( IAEItemStack is : this.list )
-		{
-			if( this.myPartitionList != null )
-			{
-				if( !this.myPartitionList.isListed( is ) )
-				{
-					continue;
-				}
-			}
+            Pattern m = null;
+            try {
+                m = Pattern.compile(innerSearch, Pattern.CASE_INSENSITIVE);
+            } catch (final Throwable ignore) {
+                try {
+                    m = Pattern.compile(Pattern.quote(innerSearch), Pattern.CASE_INSENSITIVE);
+                } catch (final Throwable __) {
+                    return Collections.<IAEItemStack>emptyList();
+                }
+            }
 
-			if( viewMode == ViewItems.CRAFTABLE && !is.isCraftable() )
-			{
-				continue;
-			}
 
-			if( viewMode == ViewItems.STORED && is.getStackSize() == 0 )
-			{
-				continue;
-			}
+            for (IAEItemStack is : list) {
+                if (this.myPartitionList != null) {
+                    if (!this.myPartitionList.isListed(is)) {
+                        continue;
+                    }
+                }
 
-			final String dspName = ( searchMod ? Platform.getModId( is ) : Platform.getItemDisplayName( is ) ).toLowerCase();
-			boolean foundMatchingItemStack = true;
+                if (viewMode == ViewItems.CRAFTABLE && !is.isCraftable()) {
+                    continue;
+                }
 
-			for( String term : innerSearch.split( " " ) )
-			{
-				if( term.length() > 1 && ( term.startsWith( "-" ) || term.startsWith( "!" ) ) )
-				{
-					term = term.substring( 1 );
-					if( dspName.contains( term ) )
-					{
-						foundMatchingItemStack = false;
-						break;
-					}
-				}
-				else if( !dspName.contains( term ) )
-				{
-					foundMatchingItemStack = false;
-					break;
-				}
-			}
+                if (viewMode == ViewItems.STORED && is.getStackSize() == 0) {
+                    continue;
+                }
 
-			if( terminalSearchToolTips && !foundMatchingItemStack )
-			{
-				final List<String> tooltip = Platform.getTooltip( is );
-				for( final String line : tooltip )
-				{
-					if( m.matcher( line ).find() )
-					{
-						foundMatchingItemStack = true;
-						break;
-					}
-				}
-			}
+                final String dspName = (searchMod ? Platform.getModId(is) : Platform.getItemDisplayName(is)).toLowerCase();
+                boolean foundMatchingItemStack = true;
 
-			if( foundMatchingItemStack )
-			{
-				if( needsZeroCopy )
-				{
-					is = is.copy();
-					is.setStackSize( 0 );
-				}
+                for (String term : innerSearch.split(" ")) {
+                    if (term.length() > 1 && (term.startsWith("-") || term.startsWith("!"))) {
+                        term = term.substring(1);
+                        if (dspName.contains(term)) {
+                            foundMatchingItemStack = false;
+                            break;
+                        }
+                    } else if (!dspName.contains(term)) {
+                        foundMatchingItemStack = false;
+                        break;
+                    }
+                }
 
-				this.view.add( is );
-			}
-		}
+                if (terminalSearchToolTips && !foundMatchingItemStack) {
+                    final List<String> tooltip = Platform.getTooltip(is);
+                    for (final String line : tooltip) {
+                        if (m.matcher(line).find()) {
+                            foundMatchingItemStack = true;
+                            break;
+                        }
+                    }
+                }
 
-		final Enum SortBy = this.sortSrc.getSortBy();
-		final Enum SortDir = this.sortSrc.getSortDir();
+                if (foundMatchingItemStack) {
+                    if (needsZeroCopy) {
+                        is = is.copy();
+                        is.setStackSize(0);
+                    }
 
-		ItemSorters.setDirection( (appeng.api.config.SortDir) SortDir );
-		ItemSorters.init();
+                    view.add(is);
+                }
+            }
 
-		if( SortBy == SortOrder.MOD )
-		{
-			Collections.sort( this.view, ItemSorters.CONFIG_BASED_SORT_BY_MOD );
-		}
-		else if( SortBy == SortOrder.AMOUNT )
-		{
-			Collections.sort( this.view, ItemSorters.CONFIG_BASED_SORT_BY_SIZE );
-		}
-		else if( SortBy == SortOrder.INVTWEAKS )
-		{
-			if( InventoryBogoSortModule.isLoaded() )
-			{
-				Collections.sort( this.view, InventoryBogoSortModule.COMPARATOR );
-			}
-			else
-			{
-				Collections.sort( this.view, ItemSorters.CONFIG_BASED_SORT_BY_INV_TWEAKS );
-			}
-		}
-		else
-		{
-			Collections.sort( this.view, ItemSorters.CONFIG_BASED_SORT_BY_NAME );
-		}
-	}
+            final Enum SortBy = this.sortSrc.getSortBy();
+            final Enum SortDir = this.sortSrc.getSortDir();
 
-	private void updateJEI( String filter )
-	{
-		Integrations.jei().setSearchText( filter );
-	}
+            ItemSorters.setDirection((appeng.api.config.SortDir) SortDir);
+            ItemSorters.init();
 
-	public int size()
-	{
-		return this.view.size();
-	}
+            if (SortBy == SortOrder.MOD) {
+                view.sort(ItemSorters.CONFIG_BASED_SORT_BY_MOD);
+            } else if (SortBy == SortOrder.AMOUNT) {
+                view.sort(ItemSorters.CONFIG_BASED_SORT_BY_SIZE);
+            } else if (SortBy == SortOrder.INVTWEAKS) {
+                if (InventoryBogoSortModule.isLoaded()) {
+                    Collections.sort(this.view, InventoryBogoSortModule.COMPARATOR);
+                } else {
+                    Collections.sort(this.view, ItemSorters.CONFIG_BASED_SORT_BY_INV_TWEAKS);
+                }
+            } else {
+                view.sort(ItemSorters.CONFIG_BASED_SORT_BY_NAME);
+            }
 
-	public void clear()
-	{
-		this.list.resetStatus();
-	}
+            return view;
+        }).thenAcceptAsync(view -> {
+            this.view.clear();
+            this.view.addAll(view);
+        }).thenRunAsync(() -> {
+            this.searchTask = null; // Prevent redundant cancellation
+        });
 
-	public boolean hasPower()
-	{
-		return this.hasPower;
-	}
 
-	public void setPower( final boolean hasPower )
-	{
-		this.hasPower = hasPower;
-	}
+    }
 
-	public int getRowSize()
-	{
-		return this.rowSize;
-	}
+    private void updateJEI(String filter) {
+        Integrations.jei().setSearchText(filter);
+    }
 
-	public void setRowSize( final int rowSize )
-	{
-		this.rowSize = rowSize;
-	}
+    public int size() {
+        return this.view.size();
+    }
 
-	public String getSearchString()
-	{
-		return this.searchString;
-	}
+    public void clear() {
+        if (searchTask != null) {
+            searchTask.cancel(true);
+            searchTask = null;
+        }
+        this.list.resetStatus();
+    }
 
-	public void setSearchString( @Nonnull final String searchString )
-	{
-		this.searchString = searchString;
-	}
+    public boolean hasPower() {
+        return this.hasPower;
+    }
+
+    public void setPower(final boolean hasPower) {
+        this.hasPower = hasPower;
+    }
+
+    public int getRowSize() {
+        return this.rowSize;
+    }
+
+    public void setRowSize(final int rowSize) {
+        this.rowSize = rowSize;
+    }
+
+    public String getSearchString() {
+        return this.searchString;
+    }
+
+    public void setSearchString(@Nonnull final String searchString) {
+        this.searchString = searchString;
+
+        if (searchTask != null) {
+            searchTask.cancel(true);
+            searchTask = null;
+        }
+
+        // Passive JEI auto search
+        final Enum<?> searchMode = AEConfig.instance().getConfigManager().getSetting(Settings.SEARCH_MODE);
+        if (searchMode == SearchBoxMode.JEI_AUTOSEARCH || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH || searchMode == SearchBoxMode.JEI_AUTOSEARCH_KEEP || searchMode == SearchBoxMode.JEI_MANUAL_SEARCH_KEEP) {
+            this.updateJEI(this.searchString);
+        }
+    }
+
+    public IItemList<IAEItemStack> getList() {
+        return list;
+    }
 }

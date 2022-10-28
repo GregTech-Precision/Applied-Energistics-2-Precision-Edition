@@ -19,8 +19,8 @@
 package appeng.container.slot;
 
 
-import javax.annotation.Nonnull;
-
+import appeng.container.AEBaseContainer;
+import appeng.util.helpers.ItemHandlerUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
@@ -30,270 +30,238 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
-import appeng.container.AEBaseContainer;
-import appeng.util.helpers.ItemHandlerUtil;
+import javax.annotation.Nonnull;
 
 
-public class AppEngSlot extends Slot
-{
-	private static IInventory emptyInventory = new InventoryBasic( "[Null]", true, 0 );
-	private final IItemHandler itemHandler;
-	private final int index;
+public class AppEngSlot extends Slot {
+    private static final IInventory emptyInventory = new InventoryBasic("[Null]", true, 0);
+    private final IItemHandler itemHandler;
+    private final int index;
 
-	private final int defX;
-	private final int defY;
-	private boolean isDraggable = true;
-	private boolean isPlayerSide = false;
-	private AEBaseContainer myContainer = null;
-	private int IIcon = -1;
-	private hasCalculatedValidness isValid;
-	private boolean isDisplay = false;
+    private final int defX;
+    private final int defY;
+    private boolean isDraggable = true;
+    private boolean isPlayerSide = false;
+    private AEBaseContainer myContainer = null;
+    private int IIcon = -1;
+    private hasCalculatedValidness isValid;
+    private boolean isDisplay = false;
+    private boolean returnAsSingleStack;
 
-	public AppEngSlot( final IItemHandler inv, final int idx, final int x, final int y )
-	{
-		super( emptyInventory, idx, x, y );
-		this.itemHandler = inv;
-		this.index = idx;
+    public AppEngSlot(final IItemHandler inv, final int idx, final int x, final int y) {
+        super(emptyInventory, idx, x, y);
+        this.itemHandler = inv;
+        this.index = idx;
 
-		this.defX = x;
-		this.defY = y;
-		this.setIsValid( hasCalculatedValidness.NotAvailable );
-	}
+        this.defX = x;
+        this.defY = y;
+        this.setIsValid(hasCalculatedValidness.NotAvailable);
+    }
 
-	public Slot setNotDraggable()
-	{
-		this.setDraggable( false );
-		return this;
-	}
+    public Slot setNotDraggable() {
+        this.setDraggable(false);
+        return this;
+    }
 
-	public Slot setPlayerSide()
-	{
-		this.isPlayerSide = true;
-		return this;
-	}
+    public Slot setPlayerSide() {
+        this.isPlayerSide = true;
+        return this;
+    }
 
-	public String getTooltip()
-	{
-		return null;
-	}
+    public String getTooltip() {
+        return null;
+    }
 
-	public void clearStack()
-	{
-		ItemHandlerUtil.setStackInSlot( this.itemHandler, this.index, ItemStack.EMPTY );
-	}
+    public void clearStack() {
+        ItemHandlerUtil.setStackInSlot(this.itemHandler, this.index, ItemStack.EMPTY);
+    }
 
-	@Override
-	public boolean isItemValid( @Nonnull final ItemStack par1ItemStack )
-	{
-		if( this.isSlotEnabled() )
-		{
-			return this.itemHandler.isItemValid( this.index, par1ItemStack );
-		}
-		return false;
-	}
+    @Override
+    public boolean isItemValid(@Nonnull final ItemStack par1ItemStack) {
+        if (this.isSlotEnabled()) {
+            return this.itemHandler.isItemValid(this.index, par1ItemStack);
+        }
+        return false;
+    }
 
-	@Override
-	@Nonnull
-	public ItemStack getStack()
-	{
-		if( !this.isSlotEnabled() )
-		{
-			return ItemStack.EMPTY;
-		}
+    @Override
+    @Nonnull
+    public ItemStack getStack() {
+        if (!this.isSlotEnabled()) {
+            return ItemStack.EMPTY;
+        }
 
-		if( this.itemHandler.getSlots() <= this.getSlotIndex() )
-		{
-			return ItemStack.EMPTY;
-		}
+        if (this.itemHandler.getSlots() <= this.getSlotIndex()) {
+            return ItemStack.EMPTY;
+        }
 
-		if( this.isDisplay() )
-		{
-			this.setDisplay( false );
-			return this.getDisplayStack();
-		}
 
-		return this.itemHandler.getStackInSlot( this.index );
-	}
+        if (this.isDisplay()) {
+            this.setDisplay(false);
+            if (this.returnAsSingleStack()) {
+                setReturnAsSingleStack(false);
+                ItemStack ret = this.getDisplayStack().copy();
+                ret.setCount(1);
+                return ret;
+            }
+            return this.getDisplayStack();
+        }
 
-	@Override
-	public void putStack( final ItemStack stack )
-	{
-		if( this.isSlotEnabled() )
-		{
-			ItemHandlerUtil.setStackInSlot( this.itemHandler, this.index, stack );
+        return this.itemHandler.getStackInSlot(this.index);
+    }
 
-			if( this.getContainer() != null )
-			{
-				this.getContainer().onSlotChange( this );
-			}
-		}
-	}
+    private boolean returnAsSingleStack() {
+        return this.returnAsSingleStack;
+    }
 
-	public IItemHandler getItemHandler()
-	{
-		return this.itemHandler;
-	}
+    public void setReturnAsSingleStack(boolean returnAsSingleStack) {
+        this.returnAsSingleStack = returnAsSingleStack;
+    }
 
-	@Override
-	public void onSlotChanged()
-	{
-		this.setIsValid( hasCalculatedValidness.NotAvailable );
-		if( this.isSlotEnabled() )
-		{
-			ItemHandlerUtil.setStackInSlot( this.itemHandler, this.index, this.getStack().copy() );
+    @Override
+    public void putStack(final ItemStack stack) {
+        if (this.isSlotEnabled()) {
+            ItemHandlerUtil.setStackInSlot(this.itemHandler, this.index, stack);
 
-			if( this.getContainer() != null )
-			{
-				this.getContainer().onSlotChange( this );
-			}
-		}
-		super.onSlotChanged();
-	}
+            if (this.getContainer() != null) {
+                this.getContainer().onSlotChange(this);
+            }
+        }
+    }
 
-	@Override
-	public int getSlotStackLimit()
-	{
-		return this.itemHandler.getSlotLimit( this.index );
-	}
+    public IItemHandler getItemHandler() {
+        return this.itemHandler;
+    }
 
-	@Override
-	public int getItemStackLimit( @Nonnull ItemStack stack )
-	{
-		return Math.min( this.getSlotStackLimit(), stack.getMaxStackSize() );
-	}
+    @Override
+    public void onSlotChanged() {
+        this.setIsValid(hasCalculatedValidness.NotAvailable);
+        if (this.isSlotEnabled()) {
+            ItemHandlerUtil.setStackInSlot(this.itemHandler, this.index, this.getStack().copy());
 
-	@Override
-	public boolean canTakeStack( final EntityPlayer par1EntityPlayer )
-	{
-		if( this.isSlotEnabled() )
-		{
-			return !this.itemHandler.extractItem( this.index, Integer.MAX_VALUE, true ).isEmpty();
-		}
-		return false;
-	}
+            if (this.getContainer() != null) {
+                this.getContainer().onSlotChange(this);
+            }
+        }
+        super.onSlotChanged();
+    }
 
-	@Override
-	@Nonnull
-	public ItemStack decrStackSize( int amount )
-	{
-		return this.itemHandler.extractItem( this.index, amount, false );
-	}
+    @Override
+    public int getSlotStackLimit() {
+        return this.itemHandler.getSlotLimit(this.index);
+    }
 
-	@Override
-	public boolean isSameInventory( Slot other )
-	{
-		return other instanceof AppEngSlot && ( (AppEngSlot) other ).itemHandler == this.itemHandler;
-	}
+    @Override
+    public int getItemStackLimit(@Nonnull ItemStack stack) {
+        return Math.min(this.getSlotStackLimit(), stack.getMaxStackSize());
+    }
 
-	@Override
-	@SideOnly( Side.CLIENT )
-	public boolean isEnabled()
-	{
-		return this.isSlotEnabled();
-	}
+    @Override
+    public boolean canTakeStack(final EntityPlayer par1EntityPlayer) {
+        if (this.isSlotEnabled()) {
+            return !this.itemHandler.extractItem(this.index, Integer.MAX_VALUE, true).isEmpty();
+        }
+        return false;
+    }
 
-	public boolean isSlotEnabled()
-	{
-		return true;
-	}
+    @Override
+    @Nonnull
+    public ItemStack decrStackSize(int amount) {
+        return this.itemHandler.extractItem(this.index, amount, false);
+    }
 
-	public ItemStack getDisplayStack()
-	{
-		return this.itemHandler.getStackInSlot( this.index );
-	}
+    @Override
+    public boolean isSameInventory(Slot other) {
+        return other instanceof AppEngSlot && ((AppEngSlot) other).itemHandler == this.itemHandler;
+    }
 
-	public float getOpacityOfIcon()
-	{
-		return 0.4f;
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean isEnabled() {
+        return this.isSlotEnabled();
+    }
 
-	public boolean renderIconWithItem()
-	{
-		return false;
-	}
+    public boolean isSlotEnabled() {
+        return true;
+    }
 
-	public int getIcon()
-	{
-		return this.getIIcon();
-	}
+    public ItemStack getDisplayStack() {
+        return this.itemHandler.getStackInSlot(this.index);
+    }
 
-	public boolean isPlayerSide()
-	{
-		return this.isPlayerSide;
-	}
+    public float getOpacityOfIcon() {
+        return 0.4f;
+    }
 
-	public boolean shouldDisplay()
-	{
-		return this.isSlotEnabled();
-	}
+    public boolean renderIconWithItem() {
+        return false;
+    }
 
-	public int getX()
-	{
-		return this.defX;
-	}
+    public int getIcon() {
+        return this.getIIcon();
+    }
 
-	public int getY()
-	{
-		return this.defY;
-	}
+    public boolean isPlayerSide() {
+        return this.isPlayerSide;
+    }
 
-	private int getIIcon()
-	{
-		return this.IIcon;
-	}
+    public boolean shouldDisplay() {
+        return this.isSlotEnabled();
+    }
 
-	public void setIIcon( final int iIcon )
-	{
-		this.IIcon = iIcon;
-	}
+    public int getX() {
+        return this.defX;
+    }
 
-	private boolean isDisplay()
-	{
-		return this.isDisplay;
-	}
+    public int getY() {
+        return this.defY;
+    }
 
-	public void setDisplay( final boolean isDisplay )
-	{
-		this.isDisplay = isDisplay;
-	}
+    private int getIIcon() {
+        return this.IIcon;
+    }
 
-	public boolean isDraggable()
-	{
-		return this.isDraggable;
-	}
+    public void setIIcon(final int iIcon) {
+        this.IIcon = iIcon;
+    }
 
-	private void setDraggable( final boolean isDraggable )
-	{
-		this.isDraggable = isDraggable;
-	}
+    private boolean isDisplay() {
+        return this.isDisplay;
+    }
 
-	void setPlayerSide( final boolean isPlayerSide )
-	{
-		this.isPlayerSide = isPlayerSide;
-	}
+    public void setDisplay(final boolean isDisplay) {
+        this.isDisplay = isDisplay;
+    }
 
-	public hasCalculatedValidness getIsValid()
-	{
-		return this.isValid;
-	}
+    public boolean isDraggable() {
+        return this.isDraggable;
+    }
 
-	public void setIsValid( final hasCalculatedValidness isValid )
-	{
-		this.isValid = isValid;
-	}
+    private void setDraggable(final boolean isDraggable) {
+        this.isDraggable = isDraggable;
+    }
 
-	protected AEBaseContainer getContainer()
-	{
-		return this.myContainer;
-	}
+    void setPlayerSide(final boolean isPlayerSide) {
+        this.isPlayerSide = isPlayerSide;
+    }
 
-	public void setContainer( final AEBaseContainer myContainer )
-	{
-		this.myContainer = myContainer;
-	}
+    public hasCalculatedValidness getIsValid() {
+        return this.isValid;
+    }
 
-	public enum hasCalculatedValidness
-	{
-		NotAvailable, Valid, Invalid
-	}
+    public void setIsValid(final hasCalculatedValidness isValid) {
+        this.isValid = isValid;
+    }
+
+    protected AEBaseContainer getContainer() {
+        return this.myContainer;
+    }
+
+    public void setContainer(final AEBaseContainer myContainer) {
+        this.myContainer = myContainer;
+    }
+
+    public enum hasCalculatedValidness {
+        NotAvailable, Valid, Invalid
+    }
 }
